@@ -1,0 +1,337 @@
+ALTER TABLE `oou`.`finalresultstable`
+ADD COLUMN `facultycode` VARCHAR(100) AFTER `coursestatus`,
+ADD COLUMN `departmentcode` VARCHAR(100) AFTER `facultycode`,
+ADD COLUMN `groupsession` VARCHAR(10) AFTER `departmentcode`;
+
+update finalresultstable set finalresultstable.facultycode='FACULTY OF SOCIAL AND MANAGEMENT SCIENCES';
+update finalresultstable set finalresultstable.departmentcode='GEOGRAPHY AND REGIONAL PLANNING';
+update finalresultstable set finalresultstable.groupsession=(select distinct regularstudents.entryyear from regularstudents where finalresultstable.registrationnumber=regularstudents.regNumber);
+
+ALTER TABLE `oou`.`examresultstable`
+ADD COLUMN `programmecode` VARCHAR(100) AFTER `studentlevel`,
+ADD COLUMN `facultycode` VARCHAR(100) AFTER `programmecode`,
+ADD COLUMN `departmentcode` VARCHAR(100) AFTER `facultycode`,
+ADD COLUMN `groupsession` VARCHAR(10) AFTER `departmentcode`;
+
+update examresultstable set examresultstable.programmecode='TRANSPORT PLANNING AND MANAGEMENT';
+update examresultstable set examresultstable.facultycode='FACULTY OF SOCIAL AND MANAGEMENT SCIENCES';
+update examresultstable set examresultstable.departmentcode='GEOGRAPHY AND REGIONAL PLANNING';
+update examresultstable set examresultstable.groupsession=(select distinct regularstudents.entryyear from regularstudents where examresultstable.registrationnumber=regularstudents.regNumber);
+
+
+ALTER TABLE `oou`.`coursestable`
+ADD COLUMN `facultycode` VARCHAR(100) AFTER `lecturerid`,
+ADD COLUMN `departmentcode` VARCHAR(100) AFTER `facultycode`,
+ADD COLUMN `sessiondescription` VARCHAR(10) AFTER `departmentcode`,
+ADD COLUMN `semesterdescription` VARCHAR(10) AFTER `sessiondescription`,
+ADD COLUMN `studentlevel` VARCHAR(10) AFTER `semesterdescription`,
+ADD COLUMN `groupsession` VARCHAR(10) AFTER `studentlevel`;
+
+update coursestable set coursestable.sessiondescription=(select distinct finalresultstable.sessiondescription from finalresultstable where finalresultstable.coursecode=coursestable.coursecode and finalresultstable.sessiondescription='2009/2010');
+update coursestable set coursestable.semesterdescription=(select distinct finalresultstable.semester from finalresultstable where finalresultstable.coursecode=coursestable.coursecode and finalresultstable.sessiondescription='2009/2010');
+update coursestable set coursestable.studentlevel=(select distinct studentlevel from finalresultstable where finalresultstable.coursecode=coursestable.coursecode and finalresultstable.sessiondescription='2009/2010');
+update coursestable set coursestable.facultycode='FACULTY OF SOCIAL AND MANAGEMENT SCIENCES';
+update coursestable set coursestable.departmentcode='GEOGRAPHY AND REGIONAL PLANNING';
+update coursestable set coursestable.groupsession='2009/2010';
+
+delete from coursestable where programmecode='GEOGRAPHY AND REGIONAL PLANNING (SMS)';
+
+select * from coursestable where coursecode not in (select coursecode from finalresultstable where finalresultstable.coursecode=coursestable.coursecode and finalresultstable.programmecode=coursestable.programmecode);
+SELECT distinct coursecode FROM coursestable where serialno in (SELECT serialno FROM coursestable where sessiondescription in (SELECT sessiondescription FROM coursestable where sessiondescription>'') )order by coursecode;
+SELECT distinct coursecode FROM finalresultstable where coursecode in
+('GNS 101','GNS 105','GRP 111','GRP 121','PHIL 103','SMS 101','TMP 101',
+'GNS 102','GRP 102','GRP 122','ILR 110',
+'GNS 103',
+'BUS 102','ECO 102','GNS 104','GNS 106','POL 102') order by coursecode;
+SELECT distinct coursecode FROM finalresultstable order by coursecode;
+
+
+ALTER TABLE `oou`.`specialfeatures`
+ADD COLUMN `facultycode` VARCHAR(100) AFTER `feature`,
+ADD COLUMN `departmentcode` VARCHAR(100) AFTER `facultycode`,
+ADD COLUMN `programmecode` VARCHAR(100) AFTER `departmentcode`,
+ADD COLUMN `studentlevel` VARCHAR(10) AFTER `programmecode`,
+ADD COLUMN `groupsession` VARCHAR(10) AFTER `studentlevel`;
+
+ALTER TABLE `oou`.`retakecourses`
+ADD COLUMN `facultycode` VARCHAR(100) AFTER `coursestatus`,
+ADD COLUMN `departmentcode` VARCHAR(100) AFTER `facultycode`,
+ADD COLUMN `programmecode` VARCHAR(100) AFTER `departmentcode`,
+ADD COLUMN `studentlevel` VARCHAR(10) AFTER `programmecode`,
+ADD COLUMN `groupsession` VARCHAR(10) AFTER `studentlevel`;
+update retakecourses set retakecourses.facultycode='FACULTY OF SOCIAL AND MANAGEMENT SCIENCES';
+update retakecourses set retakecourses.departmentcode='GEOGRAPHY AND REGIONAL PLANNING';
+update retakecourses set retakecourses.programmecode='TRANSPORT PLANNING AND MANAGEMENT';
+update retakecourses set retakecourses.studentlevel='YEAR 1';
+update retakecourses set retakecourses.sessiondescription=(select distinct coursestable.sessiondescription from coursestable where coursestable.coursecode=retakecourses.coursecode);
+update retakecourses set retakecourses.semester=(select distinct coursestable.semesterdescription from coursestable where coursestable.coursecode=retakecourses.coursecode);
+update retakecourses set retakecourses.groupsession=(select distinct coursestable.sessiondescription from coursestable where coursestable.coursecode=retakecourses.coursecode);
+
+
+********************************************************************************************************************************************************************************************************************************************************************************
+ALTER TABLE `oou`.`finalresultstable`
+ADD COLUMN `facultycode` VARCHAR(100) AFTER `coursestatus`,
+ADD COLUMN `departmentcode` VARCHAR(100) AFTER `facultycode`,
+ADD COLUMN `groupsession` VARCHAR(10) AFTER `departmentcode`;
+
+update finalresultstable set finalresultstable.facultycode='FACULTY OF SOCIAL AND MANAGEMENT SCIENCES';
+update finalresultstable set finalresultstable.departmentcode='GEOGRAPHY AND REGIONAL PLANNING';
+update finalresultstable set finalresultstable.groupsession=(select distinct regularstudents.entryyear from regularstudents where finalresultstable.registrationnumber=regularstudents.regNumber);
+update finalresultstable set finalresultstable.semester='HARMATTAN' where mod(right(coursecode,3),2)=1;
+update finalresultstable set finalresultstable.semester='RAIN' where mod(right(coursecode,3),2)=0;
+
+
+ALTER TABLE `oou`.`examresultstable`
+ADD COLUMN `programmecode` VARCHAR(100) AFTER `studentlevel`,
+ADD COLUMN `facultycode` VARCHAR(100) AFTER `programmecode`,
+ADD COLUMN `departmentcode` VARCHAR(100) AFTER `facultycode`,
+ADD COLUMN `groupsession` VARCHAR(10) AFTER `departmentcode`;
+
+update examresultstable set examresultstable.programmecode=(select distinct finalresultstable.programmecode from finalresultstable where examresultstable.registrationnumber=finalresultstable.registrationnumber);
+update examresultstable set examresultstable.facultycode='FACULTY OF SOCIAL AND MANAGEMENT SCIENCES';
+update examresultstable set examresultstable.departmentcode='GEOGRAPHY AND REGIONAL PLANNING';
+update examresultstable set examresultstable.groupsession=(select distinct regularstudents.entryyear from regularstudents where examresultstable.registrationnumber=regularstudents.regNumber);
+update examresultstable set examresultstable.semester='HARMATTAN' where mod(right(coursecode,3),2)=1;
+update examresultstable set examresultstable.semester='RAIN' where mod(right(coursecode,3),2)=0;
+
+
+ALTER TABLE `oou`.`specialfeatures`
+ADD COLUMN `facultycode` VARCHAR(100) AFTER `feature`,
+ADD COLUMN `departmentcode` VARCHAR(100) AFTER `facultycode`,
+ADD COLUMN `programmecode` VARCHAR(100) AFTER `departmentcode`,
+ADD COLUMN `studentlevel` VARCHAR(10) AFTER `programmecode`,
+ADD COLUMN `groupsession` VARCHAR(10) AFTER `studentlevel`;
+update specialfeatures set specialfeatures.facultycode='FACULTY OF SOCIAL AND MANAGEMENT SCIENCES';
+update specialfeatures set specialfeatures.departmentcode='GEOGRAPHY AND REGIONAL PLANNING';
+update specialfeatures set specialfeatures.programmecode=(select distinct finalresultstable.programmecode from finalresultstable where specialfeatures.registrationnumber=finalresultstable.registrationnumber);
+update specialfeatures set specialfeatures.studentlevel=(select distinct regularstudents.studentlevel from regularstudents where specialfeatures.registrationnumber=regularstudents.regNumber);
+update specialfeatures set specialfeatures.groupsession=(select distinct regularstudents.entryyear from regularstudents where specialfeatures.registrationnumber=regularstudents.regNumber);
+SELECT * FROM specialfeatures s;
+
+
+ALTER TABLE `oou`.`coursestable`
+ADD COLUMN `facultycode` VARCHAR(100) AFTER `lecturerid`,
+ADD COLUMN `departmentcode` VARCHAR(100) AFTER `facultycode`,
+ADD COLUMN `sessiondescription` VARCHAR(10) AFTER `departmentcode`,
+ADD COLUMN `semesterdescription` VARCHAR(10) AFTER `sessiondescription`,
+ADD COLUMN `studentlevel` VARCHAR(10) AFTER `semesterdescription`,
+ADD COLUMN `groupsession` VARCHAR(10) AFTER `studentlevel`;
+
+update coursestable set coursestable.facultycode='FACULTY OF SOCIAL AND MANAGEMENT SCIENCES';
+update coursestable set coursestable.departmentcode='GEOGRAPHY AND REGIONAL PLANNING';
+update coursestable set coursestable.sessiondescription=(select distinct finalresultstable.sessiondescription from finalresultstable where finalresultstable.coursecode=coursestable.coursecode and finalresultstable.programmecode=coursestable.programmecode);
+-- update coursestable set coursestable.semesterdescription=(select distinct finalresultstable.semester from finalresultstable where finalresultstable.coursecode=coursestable.coursecode and finalresultstable.programmecode=coursestable.programmecode);
+update coursestable set coursestable.semesterdescription='HARMATTAN' where mod(right(coursecode,3),2)=1;
+update coursestable set coursestable.semesterdescription='RAIN' where mod(right(coursecode,3),2)=0;
+update coursestable set coursestable.studentlevel=(select distinct studentlevel from finalresultstable where finalresultstable.coursecode=coursestable.coursecode and finalresultstable.programmecode=coursestable.programmecode);
+update coursestable set coursestable.groupsession=(select distinct finalresultstable.sessiondescription from finalresultstable where finalresultstable.coursecode=coursestable.coursecode and finalresultstable.programmecode=coursestable.programmecode);
+SELECT * FROM coursestable;
+select coursecode, mod(right(coursecode,3),2) from coursestable;
+select distinct finalresultstable.semester from finalresultstable where finalresultstable.coursecode='MPT 831' and finalresultstable.programmecode='2006/2007 POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES (MTSC FULL TIME)';
+delete from coursestable where coursecode not in (select coursecode from finalresultstable where finalresultstable.coursecode=coursestable.coursecode and finalresultstable.programmecode=coursestable.programmecode);
+SELECT distinct coursecode FROM coursestable where serialno in (SELECT serialno FROM coursestable where sessiondescription in (SELECT sessiondescription FROM coursestable where sessiondescription>'') )order by coursecode;
+
+
+
+ALTER TABLE `oou`.`retakecourses`
+ADD COLUMN `facultycode` VARCHAR(100) AFTER `coursestatus`,
+ADD COLUMN `departmentcode` VARCHAR(100) AFTER `facultycode`,
+ADD COLUMN `programmecode` VARCHAR(100) AFTER `departmentcode`,
+ADD COLUMN `studentlevel` VARCHAR(10) AFTER `programmecode`,
+ADD COLUMN `groupsession` VARCHAR(10) AFTER `studentlevel`;
+update retakecourses set retakecourses.facultycode='FACULTY OF SOCIAL AND MANAGEMENT SCIENCES';
+update retakecourses set retakecourses.departmentcode='GEOGRAPHY AND REGIONAL PLANNING';
+update retakecourses set retakecourses.programmecode=(select distinct regularstudents.programmecode from regularstudents where retakecourses.registrationnumber=regularstudents.regNumber);
+update retakecourses set retakecourses.studentlevel=(select distinct regularstudents.studentlevel from regularstudents where retakecourses.registrationnumber=regularstudents.regNumber);
+update retakecourses set retakecourses.sessiondescription=(select distinct finalresultstable.sessiondescription from finalresultstable where finalresultstable.coursecode=retakecourses.coursecode and finalresultstable.programmecode=retakecourses.programmecode);
+update retakecourses set retakecourses.semester=(select distinct finalresultstable.semester from finalresultstable where finalresultstable.coursecode=retakecourses.coursecode and finalresultstable.programmecode=retakecourses.programmecode);
+update retakecourses set retakecourses.groupsession=(select distinct finalresultstable.sessiondescription from finalresultstable where finalresultstable.coursecode=retakecourses.coursecode and finalresultstable.programmecode=retakecourses.programmecode);
+update retakecourses set retakecourses.semester='HARMATTAN' where mod(right(coursecode,3),2)=1;
+update retakecourses set retakecourses.semester='RAIN' where mod(right(coursecode,3),2)=0;
+SELECT * FROM retakecourses r;
+
+
+********************************************************************************************************************************************************************************************************************************************************************************
+SELECT * FROM coursestable  where coursecode='MPT 831';
+select distinct studentlevel from coursestable;
+SELECT * FROM studentslevels s;
+SELECT distinct programmecode, studentlevel FROM coursestable c;
+delete from coursestable where programmecode='TRANSPORT PLANNING AND MANAGEMENT';
+update coursestable set studentlevel='MSC FULL TIME' where programmecode='POST GRADUATE PROGRAMME IN TRANSPORT STUDIES (MSC FULLTIME)';
+update coursestable set studentlevel='MSC PART TIME I' where programmecode='POSTGRAGRADUATE PROGRAMME IN TRANSPORT STUDIES (MSC PART TIME 1)';
+update coursestable set studentlevel='MTSC FULL TIME I' where programmecode='POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES (MTSC FULL TIME)';
+update coursestable set studentlevel='MSC PART TIME II' where programmecode='POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES (MSC PART TIME 11)';
+update coursestable set studentlevel='MTSC PART I' where programmecode='POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES (MTSC PART 1)';
+update coursestable set studentlevel='MTSC PART I' where programmecode='POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES MTSC PART TIME 1';
+update coursestable set studentlevel='MTSC FULL TIME I' where programmecode='POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES MTSC FULL TIME';
+update coursestable set studentlevel='MSC FULL TIME' where programmecode='POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES MSC FULL TIME';
+update coursestable set studentlevel='MSC FULL TIME' where programmecode='2006/2007 POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES (MSC FULL TIME)';
+update coursestable set studentlevel='MTSC FULL TIME I' where programmecode='2006/2007 POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES (MTSC FULL TIME)';
+update coursestable set programmecode='POST GRADUATE PROGRAMME IN TRANSPORT STUDIES';
+update coursestable set studentlevel='MTSC PART TIME I' where studentlevel='MTSC PART I';
+update coursestable set semesterdescription='HARMATTAN' where coursecode='MTS 822';
+update coursestable set semesterdescription='RAIN' where coursecode='MTS 805';
+update coursestable set semesterdescription='RAIN' where coursecode='MTS 899';
+update coursestable set semesterdescription='HARMATTAN' where coursecode='MTS 804';
+update coursestable set semesterdescription='HARMATTAN' where coursecode='MTS 806';
+update coursestable set semesterdescription='RAIN' where coursecode='MTS 823';
+update coursestable set programmecode=concat(programmecode,' [',studentlevel,']');
+
+
+
+
+delete from examresultstable where programmecode='TRANSPORT PLANNING AND MANAGEMENT';
+update examresultstable set studentlevel='MSC FULL TIME' where programmecode='POST GRADUATE PROGRAMME IN TRANSPORT STUDIES (MSC FULLTIME)';
+update examresultstable set studentlevel='MSC PART TIME I' where programmecode='POSTGRAGRADUATE PROGRAMME IN TRANSPORT STUDIES (MSC PART TIME 1)';
+update examresultstable set studentlevel='MTSC FULL TIME I' where programmecode='POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES (MTSC FULL TIME)';
+update examresultstable set studentlevel='MSC PART TIME II' where programmecode='POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES (MSC PART TIME 11)';
+update examresultstable set studentlevel='MTSC PART I' where programmecode='POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES (MTSC PART 1)';
+update examresultstable set studentlevel='MTSC PART I' where programmecode='POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES MTSC PART TIME 1';
+update examresultstable set studentlevel='MTSC FULL TIME I' where programmecode='POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES MTSC FULL TIME';
+update examresultstable set studentlevel='MSC FULL TIME' where programmecode='POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES MSC FULL TIME';
+update examresultstable set studentlevel='MSC FULL TIME' where programmecode='2006/2007 POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES (MSC FULL TIME)';
+update examresultstable set studentlevel='MTSC FULL TIME I' where programmecode='2006/2007 POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES (MTSC FULL TIME)';
+update examresultstable set programmecode='POST GRADUATE PROGRAMME IN TRANSPORT STUDIES';
+update examresultstable set studentlevel='MTSC PART TIME I' where studentlevel='MTSC PART I';
+SELECT * FROM examresultstable e;
+update examresultstable set semester='HARMATTAN' where coursecode='MTS 822';
+update examresultstable set semester='RAIN' where coursecode='MTS 805';
+update examresultstable set semester='RAIN' where coursecode='MTS 899';
+update examresultstable set semester='HARMATTAN' where coursecode='MTS 804';
+update examresultstable set semester='HARMATTAN' where coursecode='MTS 806';
+update examresultstable set semester='RAIN' where coursecode='MTS 823';
+update examresultstable set programmecode=concat(programmecode,' [',studentlevel,']');
+
+
+
+delete from finalresultstable where programmecode='TRANSPORT PLANNING AND MANAGEMENT';
+update finalresultstable set studentlevel='MSC FULL TIME' where programmecode='POST GRADUATE PROGRAMME IN TRANSPORT STUDIES (MSC FULLTIME)';
+update finalresultstable set studentlevel='MSC PART TIME I' where programmecode='POSTGRAGRADUATE PROGRAMME IN TRANSPORT STUDIES (MSC PART TIME 1)';
+update finalresultstable set studentlevel='MTSC FULL TIME I' where programmecode='POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES (MTSC FULL TIME)';
+update finalresultstable set studentlevel='MSC PART TIME II' where programmecode='POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES (MSC PART TIME 11)';
+update finalresultstable set studentlevel='MTSC PART I' where programmecode='POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES (MTSC PART 1)';
+update finalresultstable set studentlevel='MTSC PART I' where programmecode='POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES MTSC PART TIME 1';
+update finalresultstable set studentlevel='MTSC FULL TIME I' where programmecode='POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES MTSC FULL TIME';
+update finalresultstable set studentlevel='MSC FULL TIME' where programmecode='POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES MSC FULL TIME';
+update finalresultstable set studentlevel='MSC FULL TIME' where programmecode='2006/2007 POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES (MSC FULL TIME)';
+update finalresultstable set studentlevel='MTSC FULL TIME I' where programmecode='2006/2007 POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES (MTSC FULL TIME)';
+update finalresultstable set programmecode='POST GRADUATE PROGRAMME IN TRANSPORT STUDIES';
+update finalresultstable set studentlevel='MTSC PART TIME I' where studentlevel='MTSC PART I';
+SELECT * FROM finalresultstable f;
+SELECT * FROM programmestable p;
+delete from programmestable where serialno>1;
+update finalresultstable set semester='HARMATTAN' where coursecode='MTS 822';
+update finalresultstable set semester='RAIN' where coursecode='MTS 805';
+update finalresultstable set semester='RAIN' where coursecode='MTS 899';
+update finalresultstable set semester='HARMATTAN' where coursecode='MTS 804';
+update finalresultstable set semester='HARMATTAN' where coursecode='MTS 806';
+update finalresultstable set semester='RAIN' where coursecode='MTS 823';
+SELECT * FROM finalresultstable  where coursecode='MPT 831';
+update finalresultstable set programmecode=concat(programmecode,' [',studentlevel,']');
+
+
+
+delete from registration where studentlevel='YEAR 1';
+update registration set studentlevel=(select regularstudents.studentlevel from regularstudents where regularstudents.regNumber=registration.regNumber);
+update registration set studentlevel='MSC PART TIME I' where programmecode='POSTGRAGRADUATE PROGRAMME IN TRANSPORT STUDIES (MSC PART TIME 1)';
+update registration set studentlevel='MTSC FULL TIME I' where programmecode='POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES (MTSC FULL TIME)';
+update registration set studentlevel='MSC PART TIME II' where programmecode='POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES (MSC PART TIME 11)';
+update registration set studentlevel='MTSC PART I' where programmecode='POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES (MTSC PART 1)';
+update registration set studentlevel='MTSC PART I' where programmecode='POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES MTSC PART TIME 1';
+update registration set studentlevel='MTSC FULL TIME I' where programmecode='POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES MTSC FULL TIME';
+update registration set studentlevel='MSC FULL TIME' where programmecode='POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES MSC FULL TIME';
+update registration set studentlevel='MSC FULL TIME' where programmecode='2006/2007 POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES (MSC FULL TIME)';
+update registration set studentlevel='MTSC FULL TIME I' where programmecode='2006/2007 POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES (MTSC FULL TIME)';
+update registration set programmecode='POST GRADUATE PROGRAMME IN TRANSPORT STUDIES';
+update registration set studentlevel='MTSC PART TIME I' where studentlevel='MTSC PART I';
+SELECT * FROM registration r;
+update registration set programmecode=concat(programmecode,' [',studentlevel,']');
+
+
+
+delete from regularstudents where programmecode='TRANSPORT PLANNING AND MANAGEMENT';
+update regularstudents set studentlevel='MSC FULL TIME' where programmecode='POST GRADUATE PROGRAMME IN TRANSPORT STUDIES (MSC FULLTIME)';
+update regularstudents set studentlevel='MSC PART TIME I' where programmecode='POSTGRAGRADUATE PROGRAMME IN TRANSPORT STUDIES (MSC PART TIME 1)';
+update regularstudents set studentlevel='MTSC FULL TIME I' where programmecode='POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES (MTSC FULL TIME)';
+update regularstudents set studentlevel='MSC PART TIME II' where programmecode='POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES (MSC PART TIME 11)';
+update regularstudents set studentlevel='MTSC PART I' where programmecode='POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES (MTSC PART 1)';
+update regularstudents set studentlevel='MTSC PART I' where programmecode='POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES MTSC PART TIME 1';
+update regularstudents set studentlevel='MTSC FULL TIME I' where programmecode='POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES MTSC FULL TIME';
+update regularstudents set studentlevel='MSC FULL TIME' where programmecode='POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES MSC FULL TIME';
+update regularstudents set studentlevel='MSC FULL TIME' where programmecode='2006/2007 POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES (MSC FULL TIME)';
+update regularstudents set studentlevel='MTSC FULL TIME I' where programmecode='2006/2007 POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES (MTSC FULL TIME)';
+update regularstudents set programmecode='POST GRADUATE PROGRAMME IN TRANSPORT STUDIES';
+update regularstudents set studentlevel='MTSC PART TIME I' where studentlevel='MTSC PART I';
+SELECT * FROM regularstudents r;
+update regularstudents set programmecode=concat(programmecode,' [',studentlevel,']');
+
+
+
+delete from retakecourses where programmecode='TRANSPORT PLANNING AND MANAGEMENT';
+update retakecourses set studentlevel='MSC FULL TIME' where programmecode='POST GRADUATE PROGRAMME IN TRANSPORT STUDIES (MSC FULLTIME)';
+update retakecourses set studentlevel='MSC PART TIME I' where programmecode='POSTGRAGRADUATE PROGRAMME IN TRANSPORT STUDIES (MSC PART TIME 1)';
+update retakecourses set studentlevel='MTSC FULL TIME I' where programmecode='POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES (MTSC FULL TIME)';
+update retakecourses set studentlevel='MSC PART TIME II' where programmecode='POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES (MSC PART TIME 11)';
+update retakecourses set studentlevel='MTSC PART I' where programmecode='POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES (MTSC PART 1)';
+update retakecourses set studentlevel='MTSC PART I' where programmecode='POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES MTSC PART TIME 1';
+update retakecourses set studentlevel='MTSC FULL TIME I' where programmecode='POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES MTSC FULL TIME';
+update retakecourses set studentlevel='MSC FULL TIME' where programmecode='POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES MSC FULL TIME';
+update retakecourses set studentlevel='MSC FULL TIME' where programmecode='2006/2007 POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES (MSC FULL TIME)';
+update retakecourses set studentlevel='MTSC FULL TIME I' where programmecode='2006/2007 POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES (MTSC FULL TIME)';
+update retakecourses set programmecode='POST GRADUATE PROGRAMME IN TRANSPORT STUDIES';
+update retakecourses set studentlevel='MTSC PART TIME I' where studentlevel='MTSC PART I';
+SELECT * FROM retakecourses r;
+update retakecourses set semester='HARMATTAN' where coursecode='MTS 822';
+update retakecourses set semester='RAIN' where coursecode='MTS 805';
+update retakecourses set semester='RAIN' where coursecode='MTS 899';
+update retakecourses set semester='HARMATTAN' where coursecode='MTS 804';
+update retakecourses set semester='HARMATTAN' where coursecode='MTS 806';
+update retakecourses set semester='RAIN' where coursecode='MTS 823';
+SELECT * FROM retakecourses  where coursecode='MPT 831';
+update retakecourses set programmecode=concat(programmecode,' [',studentlevel,']');
+
+
+delete from retakecourses where programmecode='TRANSPORT PLANNING AND MANAGEMENT';
+update retakecourses set studentlevel='MSC FULL TIME' where programmecode='POST GRADUATE PROGRAMME IN TRANSPORT STUDIES (MSC FULLTIME)';
+update retakecourses set studentlevel='MSC PART TIME I' where programmecode='POSTGRAGRADUATE PROGRAMME IN TRANSPORT STUDIES (MSC PART TIME 1)';
+update retakecourses set studentlevel='MTSC FULL TIME I' where programmecode='POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES (MTSC FULL TIME)';
+update retakecourses set studentlevel='MSC PART TIME II' where programmecode='POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES (MSC PART TIME 11)';
+update retakecourses set studentlevel='MTSC PART I' where programmecode='POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES (MTSC PART 1)';
+update retakecourses set studentlevel='MTSC PART I' where programmecode='POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES MTSC PART TIME 1';
+update retakecourses set studentlevel='MTSC FULL TIME I' where programmecode='POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES MTSC FULL TIME';
+update retakecourses set studentlevel='MSC FULL TIME' where programmecode='POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES MSC FULL TIME';
+update retakecourses set studentlevel='MSC FULL TIME' where programmecode='2006/2007 POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES (MSC FULL TIME)';
+update retakecourses set studentlevel='MTSC FULL TIME I' where programmecode='2006/2007 POSTGRADUATE PROGRAMME IN TRANSPORT STUDIES (MTSC FULL TIME)';
+update retakecourses set programmecode='POST GRADUATE PROGRAMME IN TRANSPORT STUDIES';
+update retakecourses set studentlevel='MTSC PART TIME I' where studentlevel='MTSC PART I';
+SELECT * FROM retakecourses r;
+update retakecourses set semester='HARMATTAN' where coursecode='MTS 822';
+update retakecourses set semester='RAIN' where coursecode='MTS 805';
+update retakecourses set semester='RAIN' where coursecode='MTS 899';
+update retakecourses set semester='HARMATTAN' where coursecode='MTS 804';
+update retakecourses set semester='HARMATTAN' where coursecode='MTS 806';
+update retakecourses set semester='RAIN' where coursecode='MTS 823';
+SELECT * FROM retakecourses  where coursecode='MPT 831';
+update retakecourses set programmecode=concat(programmecode,' [',studentlevel,']');
+
+
+
+
+
+SELECT * FROM studentslevels s;
+delete  FROM studentslevels;
+select distinct studentlevel from finalresultstable;
+SELECT * FROM programmestable p;
+update retakecourses set programmecode=concat(programmecode,' [',studentlevel,']');
+SELECT * FROM finalresultstable where sessiondescription='2004/2005' and semester='HARMATTAN' and studentlevel='MSC FULL TIME' AND registrationnumber='97020883'order by registrationnumber, coursecode;
+SELECT coursecode, coursedescription, courseunit, minimumscore FROM coursestable where coursecode='MTS 801' and facultycode='FACULTY OF SOCIAL AND MANAGEMENT SCIENCES' and departmentcode='GEOGRAPHY AND REGIONAL PLANNING' and programmecode='POST GRADUATE PROGRAMME IN TRANSPORT STUDIES [MSC FULL TIME]' and groupsession='' and studentlevel='' and sessiondescription='2004/2005' and semesterdescription='HARMATTAN' ;
+SELECT * FROM finalresultstable f;
+
+
+
+
+SELECT * FROM finalresultstable where ((sessiondescription='2006/2007' and semester='HARMATTAN') or (sessiondescription='2006/2007' and semester<'HARMATTAN') or (sessiondescription<'2006/2007')) and registrationnumber='05/08/005669' and marksobtained<50 and facultycode='FACULTY OF SOCIAL AND MANAGEMENT SCIENCES' and departmentcode='GEOGRAPHY AND REGIONAL PLANNING' and programmecode='POST GRADUATE PROGRAMME IN TRANSPORT STUDIES' and groupsession='2006/2007' order by right(coursecode,3) desc, left(coursecode,3) ;
+SELECT distinct coursecode, courseunit, minimumscore, coursetype FROM coursestable where ((sessiondescription='2006/2007' and semesterdescription='HARMATTAN') or (sessiondescription='2006/2007' and semesterdescription<'HARMATTAN') or (sessiondescription<'2006/2007')) and sessiondescription>='2006/2007' and facultycode='FACULTY OF SOCIAL AND MANAGEMENT SCIENCES' and departmentcode='GEOGRAPHY AND REGIONAL PLANNING' and programmecode='POST GRADUATE PROGRAMME IN TRANSPORT STUDIES' and groupsession='2006/2007' and coursetype in ('Required', 'Compulsory');
+
+
+

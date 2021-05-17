@@ -1,0 +1,335 @@
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>osTicket :: Staff Control Panel</title>
+<link rel="stylesheet" href="css/main.css" media="screen">
+<link rel="stylesheet" href="css/style.css" media="screen">
+<link rel="stylesheet" href="css/tabs.css" type="text/css">
+<link rel="stylesheet" href="css/autosuggest_inquisitor.css" type="text/css" media="screen" charset="utf-8" />
+<script type="text/javascript" src="js/ajax.js"></script>
+<script type="text/javascript" src="js/scp.js"></script>
+<script type="text/javascript" src="js/tabber.js"></script>
+<script type="text/javascript" src="js/calendar.js"></script>
+<script type="text/javascript" src="js/bsn.AutoSuggest_2.1.3.js" charset="utf-8"></script>
+<script type="text/javascript" src="js/autolock.js" charset="utf-8"></script>
+</head>
+<body>
+<div id="system_notice"><strong>System is set to offline mode</strong> - Client interface is disabled and ONLY admins can access staff control panel. <a href="admin.php?t=pref">Enable</a>.</div>
+<div id="container">
+    <div id="header">
+        <a id="logo" href="index.php" title="osTicket"><img src="images/ostlogo.jpg" width="188" height="72" alt="osTicket"></a>
+        <p id="info">Welcome back, <strong>Adewale</strong> 
+                       | <a href="admin.php">Admin Panel</a> 
+                        | <a href="profile.php?t=pref">My Preference</a> | <a href="logout.php">Log Out</a></p>
+    </div>
+    <div id="nav">
+        <ul id="main_nav" class="dist">
+                            <li><a class="active" href="tickets.php" title="Ticket Queue">Tickets</a></li>
+                            <li><a  href="kb.php" title="Knowledge Base: Premade">Knowledge Base</a></li>
+                            <li><a  href="directory.php" title="Staff Directory">Directory</a></li>
+                            <li><a  href="profile.php" title="My Profile">My Account</a></li>
+                    </ul>
+        <ul id="sub_nav">
+                            <li><a class="answeredTickets" href="tickets.php?status=answered" title="Answered Tickets">Answered (1)</a></li>
+                              <li><a class="closedTickets" href="tickets.php?status=closed" title="Closed Tickets">Closed Tickets</a></li>
+                              <li><a class="newTicket" href="tickets.php?a=open" title="">New Ticket</a></li>
+                      </ul>
+    </div>
+    <div class="clear"></div>
+    <div id="content" width="100%">
+
+<table width="100%" cellpadding="2" cellspacing="0" border="0">
+    <tr>
+        <td class="msg" width=50%>
+            Ticket #763696&nbsp;<a href="tickets.php?id=1" title="Reload"><span class="Icon refresh">&nbsp;</span></a></td>
+
+        <td class="msg" width=50%>
+                         <a href="tickets.php?id=1&a=edit" title="Edit Ticket" class="Icon editTicket">Edit Ticket</a>
+                    </td>
+    </tr>
+    <tr>
+     <td width=50%>	
+		<table align="center" class="ticketinfo" cellspacing="1" cellpadding="3" width="100%" border=0>
+			<tr>
+				<th>Status:</th>
+				<td>open</td>
+			</tr>
+			<tr>
+        		<th>Priority:</th>
+        		<td>Normal</td>
+   	 		</tr>
+            <tr>
+                <th>Department:</th>
+                <td>Support</td>
+            </tr>
+			<tr>
+                <th>Create Date:</th>
+                <td>03/07/2012 9:31 pm</td>
+            </tr>
+		</table>
+     </td>
+     <td width=50% valign="top">
+        <table align="center" class="ticketinfo" cellspacing="1" cellpadding="3" width="100%" border=0>
+            <tr>
+                <th>Name:</th>
+                <td>osTicket Support</td>
+            </tr>
+            <tr>
+                <th>Email:</th>
+                <td>support@osticket.com&nbsp;&nbsp;<a href="tickets.php?a=search&query=support%40osticket.com" title="Related Tickets">(<b>1</b>)</a>                </td>
+            </tr>
+            <tr>
+                <th>Phone:</th>
+                <td></td>
+            </tr>
+            <tr>
+                <th>Source:</th>
+                <td>Web</td>
+            </tr>
+        </table>
+     </td>
+    </tr>
+    <tr><td colspan=2 class="msg">Subject: osTicket Installed!</td></tr>
+    <tr>
+     <td valign="top" width=50%>
+        <table align="center" class="ticketinfo" cellspacing="1" cellpadding="3" width="100%" border=0>
+            <tr>
+                <th>Assigned Staff:</th>
+                <td>- unassigned -</td>
+            </tr>
+            <tr>
+                <th nowrap>Last Response:</th>
+                <td>03/15/2012 1:53 pm</td>
+            </tr>
+                        <tr>
+                <th>Due Date:</th>
+                <td></td>
+            </tr>
+                    </table>
+     </td>
+     <td width=50% valign="top">
+        <table align="center" class="ticketinfo" cellspacing="1" cellpadding="3" width="100%" border=0>
+            <tr><th>Help Topic:</th>
+                <td>Commercial support                </td>
+            </tr>
+            <tr>
+                <th>IP Address:</th>
+                <td></td>
+            </tr>
+            <tr><th nowrap>Last Message:</th>
+                <td>03/07/2012 9:31 pm</td>
+            </tr>
+        </table>
+     </td>
+    </tr>
+</table>
+<div>
+    </div>
+ 
+<table cellpadding="0" cellspacing="2" border="0" width="100%" class="ticketoptions">
+    <tr><td>
+        <form name=action action='tickets.php?id=1' method=post class="inline" >
+            <input type='hidden' name='ticket_id' value="1"/>
+             <input type='hidden' name='a' value="process"/>
+            <span for="do"> &nbsp;<b>Action:</b></span>
+            <select id="do" name="do" 
+              onChange="this.form.ticket_priority.disabled=strcmp(this.options[this.selectedIndex].value,'change_priority','reopen','overdue')?false:true;">
+                <option value="">Select Action</option>
+                <option value="change_priority"  >Change Priority</option>
+                                <option value="overdue"  >Mark Overdue</option>
+                                                
+                                     <option value="close"  >Close Ticket</option>
+                                        
+                        <option value="banemail" >Ban Email &amp; Close</option>
+                                    
+                                <option value="delete" >Delete Ticket</option>
+                            </select>
+            <span for="ticket_priority">Priority:</span>
+            <select id="ticket_priority" name="ticket_priority" disabled >
+                <option value="0" selected="selected">-Unchanged-</option>
+                                    <option value="1"  >Low</option>
+                                    <option value="2" disabled >Normal</option>
+                                    <option value="3"  >High</option>
+                                    <option value="4"  >Emergency</option>
+                            </select>
+                &nbsp;&nbsp;
+            <input class="button" type="submit" value="GO">
+        </form>
+    </tr></td>
+</table>
+<br>
+<div align="left">
+    <a class="Icon thread" href="#" onClick="toggleLayer('ticketthread'); return false;">Ticket Thread</a>
+    <div id="ticketthread">
+			    <table align="center" class="message" cellspacing="0" cellpadding="1" width="100%" border=0>
+		        <tr><th>Wed, Mar 7 2012 9:31pm</th></tr>
+                                <tr><td>Thank you for choosing osTicket.<br />
+<br />
+Please make sure you join the osTicket forums at <a href="http://osticket.com/forums" target="_blank">http://osticket.com/forums</a> to stay up to date on the latest news, security alerts and updates. The osTicket forums are also a great place to get assistance, guidance, tips, and help from other osTicket users. In addition to the forums, the osTicket wiki provides a useful collection of educational materials, documentation, and notes from the community. We welcome your contributions to the osTicket community.<br />
+<br />
+If you are looking for a greater level of support, we provide professional services and commercial support with guaranteed response times, and access to the core development team. We can also help customize osTicket or even add new features to the system to meet your unique needs.<br />
+<br />
+For more information or to discuss your needs, please contact us today at <a href="http://osticket.com/support/." target="_blank">http://osticket.com/support/.</a> Your feedback is greatly appreciated!<br />
+<br />
+- The osTicket Team&nbsp;</td></tr>
+		    </table>
+                		    <table align="center" class="response" cellspacing="0" cellpadding="1" width="100%" border=0>
+    		        <tr><th>Sat, Mar 10 2012 7:34pm&nbsp;-&nbsp;Admin Admin</th></tr>
+                    			        <tr><td> just type anything</td></tr>
+		        </table>
+	            		    <table align="center" class="response" cellspacing="0" cellpadding="1" width="100%" border=0>
+    		        <tr><th>Thu, Mar 15 2012 1:53pm&nbsp;-&nbsp;Admin Admin</th></tr>
+                    			        <tr><td> Typing another comments.</td></tr>
+		        </table>
+	            </div>
+</div>
+<table align="center" cellspacing="0" cellpadding="3" width="90%" border=0>
+    <tr> <td align="center">
+             <p align="center" id="infomessage">Response Posted Successfully</p>
+     
+  </td></tr>
+    <tr> <td align="center">
+        <div class="tabber">
+            <div id="reply" class="tabbertab" align="left">
+                <h2>Post Reply</h2>
+                <p>
+                    <form action="tickets.php?id=1#reply" name="reply" id="replyform" method="post" enctype="multipart/form-data">
+                        <input type="hidden" name="ticket_id" value="1">
+                        <input type="hidden" name="msg_id" value="1">
+                        <input type="hidden" name="a" value="reply">
+                        <div><font class="error">&nbsp;</font></div>
+                        <div>
+                                                          Canned Response:&nbsp;
+                               <select id="canned" name="canned"
+                                onChange="getCannedResponse(this.options[this.selectedIndex].value,this.form,'response');this.selectedIndex='0';" >
+                                <option value="0" selected="selected">Select a premade reply</option>
+                                                                 <option value="1" >What is osTicket (sample)?</option>
+                                                                 <option value="2" >Sample (with variables)</option>
+                                                               </select>&nbsp;&nbsp;&nbsp;<label><input type='checkbox' value='1' name=append checked="true" />Append</label>
+                                                        <textarea name="response" id="response" cols="90" rows="9" wrap="soft" style="width:90%"></textarea>
+                        </div>
+                                                                          <div style="margin-top: 10px;">
+                                <label for="signature" nowrap>Append Signature:</label>
+                                <label><input type="radio" name="signature" value="none" checked > None</label>
+                                                                                                <label><input type="radio" name="signature" value="dept"  > Dept Signature</label>
+                                                           </div>
+                                                 <div style="margin-top: 3px;">
+                            <b>Ticket Status:</b>
+                                                        <label><input type="checkbox" name="ticket_status" id="l_ticket_status" value="Close"  > Close on Reply</label>
+                                                    </div>
+                        <p>
+                            <div  style="margin-left: 50px; margin-top: 30px; margin-bottom: 10px;border: 0px;">
+                                <input class="button" type='submit' value='Post Reply' />
+                                <input class="button" type='reset' value='Reset' />
+                                <input class="button" type='button' value='Cancel' onClick="history.go(-1)" />
+                            </div>
+                        </p>
+                    </form>                
+                </p>
+            </div>
+            <div id="notes" class="tabbertab"  align="left">
+                <h2>Post Internal Note</h2>
+                <p>
+                    <form action="tickets.php?id=1#notes" name="notes" class="inline" method="post" enctype="multipart/form-data">
+                        <input type="hidden" name="ticket_id" value="1">
+                        <input type="hidden" name="a" value="postnote">
+                        <div>
+                            <label for="title">Note Title:</label>
+                            <input type="text" name="title" id="title" value="" size=30px />
+                            </select><font class="error">*&nbsp;</font>
+                        </div>
+                        <div style="margin-top: 3px;">
+                            <label for="note" valign="top">Enter note content.
+                                <font class="error">*&nbsp;</font></label><br/>
+                            <textarea name="note" id="note" cols="80" rows="7" wrap="soft" style="width:90%"></textarea>
+                        </div>
+
+                                                <div style="margin-top: 3px;">
+                            <b>Ticket Status:</b>
+                                                        <label><input type="checkbox" name="ticket_status" id="ticket_status" value="Close"  > Close Ticket</label>
+                                                    </div>
+                                                <p>
+                            <div  align="left" style="margin-left: 50px;margin-top: 10px; margin-bottom: 10px;border: 0px;">
+                                <input class="button" type='submit' value='Submit' />
+                                <input class="button" type='reset' value='Reset' />
+                                <input class="button" type='button' value='Cancel' onClick="history.go(-1)" />
+                            </div>
+                        </p>
+                    </form>
+                </p>
+            </div>
+                        <div id="transfer" class="tabbertab"  align="left">
+                <h2>Dept. Transfer</h2>
+                <p>
+
+                    <form action="tickets.php?id=1#transfer" name="notes" method="post" enctype="multipart/form-data">
+                        <input type="hidden" name="ticket_id" value="1">
+                        <input type="hidden" name="a" value="transfer">
+                        <div>
+                            <span for="dept_id">Department:</span>
+                            <select id="dept_id" name="dept_id">
+                                <option value="" selected="selected">-Select Target Dept.-</option>
+                                                                    <option value="2">Billing Department </option>
+                                                            </select><font class='error'>&nbsp;*</font>
+                        </div>
+                        <div>
+                            <span >Comments/Reasons for the transfer. &nbsp;(<i>Internal note</i>)
+                                <font class='error'>&nbsp;*</font></span>
+                            <textarea name="message" id="message" cols="80" rows="7" wrap="soft" style="width:90%;"></textarea>
+                        </div>
+                        <p>
+                            <div  style="margin-left: 50px; margin-top: 5px; margin-bottom: 10px;border: 0px;" align="left">
+                                <input class="button" type='submit' value='Transfer' />
+                                <input class="button" type='reset' value='Reset' />
+                                <input class="button" type='button' value='Cancel' onClick="history.go(-1)" />
+                            </div>
+                        </p>
+                    </form>
+                </p>
+            </div>
+                                    <div id="assign" class="tabbertab"  align="left">
+                
+                <h2>Assign to Staff</h2>
+                <p>
+                    <form action="tickets.php?id=1#assign" name="notes" method="post" enctype="multipart/form-data">
+                        <input type="hidden" name="ticket_id" value="1">
+                        <input type="hidden" name="a" value="assign">
+                        <div>
+                            <span for="staffId">Staff Member:</span>
+                            <select id="staffId" name="staffId">
+                                <option value="0" selected="selected">-Select Staff Member.-</option>
+                                                                    <option value="1">Admin, Admin</option>
+                                                            </select><font class='error'>&nbsp;*</font>
+                        </div>
+                        <div>
+                            <span >Comments/message for assignee. &nbsp;(<i>Saved as internal note</i>)
+                                <font class='error'>&nbsp;*</font></span>
+                            <textarea name="assign_message" id="assign_message" cols="80" rows="7" 
+                                wrap="soft" style="width:90%;"></textarea>
+                        </div>
+                        <p>
+                            <div  style="margin-left: 50px; margin-top: 5px; margin-bottom: 10px;border: 0px;" align="left">
+                                <input class="button" type='submit' value='Assign' />
+                                <input class="button" type='reset' value='Reset' />
+                                <input class="button" type='button' value='Cancel' onClick="history.go(-1)" />
+                            </div>
+                        </p>
+                    </form>
+                </p>
+            </div>
+                    </div>
+    </td>
+ </tr>
+</table>
+
+</div> 
+</div>
+<div id="footer">Copyright &copy; 2006-2012&nbsp;osTicket.com. &nbsp;All Rights Reserved.</div>
+<div>
+    <!-- Do not remove <img src="autocron.php" alt="" width="1" height="1" border="0" /> or your auto cron will cease to function -->
+    <img src="autocron.php" alt="" width="1" height="1" border="0" />
+    <!-- Do not remove <img src="autocron.php" alt="" width="1" height="1" border="0" /> or your auto cron will cease to function -->
+</div>
+</div>
+</body>
+</html>

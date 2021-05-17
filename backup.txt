@@ -1,0 +1,362 @@
+/* ----   A    ------*/
+					/*$queryD = "SELECT min(sessions) as firstsession FROM registration where regNumber='{$regNumber}'  ";
+					$resultD = mysql_query($queryD, $connection);
+					extract (mysql_fetch_array($resultD));
+
+					$PrevSession=$GLOBALS['PrevSession'];
+					$PrevSemester=$GLOBALS['PrevSemester'];
+					$queryPrevRemark = "SELECT serialno from remarkstable where matricno='{$matno}' and facultycode='{$facultycodes}' and departmentcode='{$departmentcodes}' and programmecode='{$programmecodes}' and studentlevel='{$studentlevels}' and sessions='{$PrevSession}' and semester='{$PrevSemester}' ";
+					$resultPrevRemark = mysql_query($queryPrevRemark, $connection);
+					if($PrevSession==null || $PrevSession==""){
+						$GLOBALS['PrevRemarkSNo']=0;
+					}else{
+						if(mysql_num_rows($resultPrevRemark) > 0){
+							extract (mysql_fetch_array($resultPrevRemark));
+							$GLOBALS['PrevRemarkSNo']=$serialno;
+						}
+					}
+//echo $queryPrevRemark;
+//return true;
+					if($GLOBALS['PrevRemarkSNo']!=null && $GLOBALS['PrevRemarkSNo']!="" && $GLOBALS['PrevRemarkSNo']>0){
+						$PrevRemarkSNo = $GLOBALS['PrevRemarkSNo'];
+						$queryPrevRemark = "SELECT * from remarkstable where serialno='{$PrevRemarkSNo}' ";
+						$resultPrevRemark = mysql_query($queryPrevRemark, $connection);
+						if(mysql_num_rows($resultPrevRemark) > 0){
+							extract (mysql_fetch_array($resultPrevRemark));
+						}
+
+						$query4 = "SELECT count(*) as totalDNRcourses FROM finalresultstable where sessiondescription='{$sessionss}' and semester='{$semesters}' and registrationnumber='{$regNumber}' and gradecode='DNR' ";
+						$result4 = mysql_query($query4, $connection);
+						extract (mysql_fetch_array($result4));
+
+						if($totalDNRcourses==$GLOBALS['noofcourses']){
+							if($remarkdnr==""){
+								$remarkdnr="DNR1";
+							}else if($remarkdnr=="DNR1"){
+								$remarkdnr="DNR2";
+							}else if($remarkdnr=="DNR2"){
+								$remarkdnr="DNR3VW";
+							}else if(str_in_str($remarkdnr,"VW")){
+								$remarkdnr="DLT";
+								//$dltstudents .= $regNumber."][";
+							}
+						}else{
+							$remarkdnr="";
+						}
+						if($sesionsreabsurption==$sessionss) $remarkdnr="";
+
+						$curGP =  getCurrentGPA($facultycodes, $departmentcodes, $programmecodes, $studentlevel, $sessions, $semester, $regNumber);
+						$theCurGPs = explode("][", $curGP);
+						$preGP = getPreviousGPA($facultycodes, $departmentcodes, $programmecodes, $studentlevel, $sessions, $semester, $regNumber);
+						$thePreGPs = explode("][", $preGP);
+						$tcp=0.0; $cgpa=0;
+						$query2 = "SELECT regNumber, tcp, tnu, gpa, tnup FROM regularstudents where regNumber='{$regNumber}' and facultycode='{$facultycodes}' and departmentcode='{$departmentcodes}' and programmecode='{$programmecodes}' ";
+						$result2 = mysql_query($query2, $connection);
+						if(mysql_num_rows($result2) > 0){
+							while ($row2 = mysql_fetch_array($result2)) {
+								extract ($row2);
+								$tcp=$row2[1]; 
+								$tnu=$row2[2]; 
+							}
+						}
+						if($tcp==null) $tcp=0;
+						if($tnu==null) $tnu=0;
+						if((($theCurGPs[0]+$thePreGPs[0]+$tcp)==0) || 
+							(($theCurGPs[1]+$thePreGPs[1]+$tnu)==0)){
+							$cgpa = 0;
+						}else{
+							$cgpa = (doubleval($theCurGPs[0])+doubleval($thePreGPs[0])+doubleval($tcp))/ (doubleval($theCurGPs[1])+doubleval($thePreGPs[1])+doubleval($tnu));
+						}
+
+						if(str_in_str($remarkprob,"TW")){
+							$remarkprob="DLT";
+							$dltstudents .= $regNumber."][";
+						}else if(intval(number_format($cgpa,2))<2 && $remarkprob=="") {
+							$remarkprob="P1";
+							if(str_in_str($remarkdnr,"DNR")) $remarkprob="";
+						}else if(intval(number_format($cgpa,2))<2 && $remarkprob=="P1") {
+							$remarkprob="P2";
+							if(str_in_str($remarkdnr,"DNR")) $remarkprob="P1";
+						}else if(intval(number_format($cgpa,2))<1 && $remarkprob=="P1") {
+							$remarkprob="P2TW";
+							if(str_in_str($remarkdnr,"DNR")) $remarkprob="P1";
+						}else if(intval(number_format($cgpa,2))<1 && $remarkprob=="P2") {
+							$remarkprob="P3TW";
+							if(str_in_str($remarkdnr,"DNR")) $remarkprob="P2";
+						}else if(intval(number_format($cgpa,2))<2 && $remarkprob=="P2") {
+							$remarkprob="P3TW";
+							if(str_in_str($remarkdnr,"DNR")) $remarkprob="P2";
+						}else{
+							$remarkprob="";
+						}
+
+						$queryRemark = "update remarkstable set remarkprob='{$remarkprob}', remarkdnr='{$remarkdnr}' where matricno='{$regNumber}' and facultycode='{$facultycodes}' and departmentcode='{$departmentcodes}' and programmecode='{$programmecodes}' and studentlevel='{$studentlevels}' and sessions='{$sessionss}' and semester='{$semesters}' ";
+						mysql_query($queryRemark, $connection);
+
+//if($regNumber>='126251002' && $regNumber<='126251002') echo $queryRemark."  3   queryRemark<br>";
+					}else{
+						$queryD = "SELECT b.* FROM regularstudents a, registration b where a.regNumber=b.regNumber and a.regNumber='{$registrationnumber}' and ((b.sessions='{$sessionss}' and b.semester='{$semesters}') or (b.sessions='{$sessionss}' and b.semester<'{$semesters}') or (b.sessions<'{$sessionss}')) and b.sessions>='{$firstsession}' and a.facultycode='{$facultycodes}' and a.departmentcode='{$departmentcodes}' and a.programmecode='{$programmecodes}' order by b.sessions, b.semester";
+						$resultD = mysql_query($queryD, $connection);
+						$thecounter=0;
+						$remarkprob="";
+						$remarkdnr="";
+						if(mysql_num_rows($resultD) > 0){
+	//echo "$queryD----------------------- <br><br><br>";
+							while ($rowD = mysql_fetch_array($resultD)) {
+								extract ($rowD);
+								$thecounter++;
+
+								$query4 = "SELECT count(*) as totalDNRcourses FROM finalresultstable where sessiondescription='{$sessions}' and semester='{$semester}' and registrationnumber='{$regNumber}' and gradecode='DNR' ";
+								$result4 = mysql_query($query4, $connection);
+								extract (mysql_fetch_array($result4));
+								//if($registered!="Yes" && $thecounter>=2){
+								if($totalDNRcourses==$GLOBALS['noofcourses'] && $thecounter>=2){
+									if($remarkdnr==""){
+										$remarkdnr="DNR1";
+									}else if($remarkdnr=="DNR1"){
+										$remarkdnr="DNR2";
+									}else if($remarkdnr=="DNR2"){
+										$remarkdnr="DNR3VW";
+									}else if(str_in_str($remarkdnr,"VW")){
+										$remarkdnr="DLT";
+										//$dltstudents .= $regNumber."][";
+									}
+								}else{
+									$remarkdnr="";
+								}
+	//echo $remarkdnr.'  '.$query4.'  '.$totalDNRcourses.'  '.$GLOBALS['noofcourses'].'   B<br>';
+								if($sesionsreabsurption==$sessionss) $remarkdnr="";
+
+								$curGP =  getCurrentGPA($facultycodes, $departmentcodes, $programmecodes, $studentlevel, $sessions, $semester, $regNumber);
+								$theCurGPs = explode("][", $curGP);
+								$preGP = getPreviousGPA($facultycodes, $departmentcodes, $programmecodes, $studentlevel, $sessions, $semester, $regNumber);
+								$thePreGPs = explode("][", $preGP);
+								$tcp=0.0; $cgpa=0;
+								$query2 = "SELECT regNumber, tcp, tnu, gpa, tnup FROM regularstudents where regNumber='{$regNumber}' and facultycode='{$facultycodes}' and departmentcode='{$departmentcodes}' and programmecode='{$programmecodes}' ";
+								$result2 = mysql_query($query2, $connection);
+								if(mysql_num_rows($result2) > 0){
+									while ($row2 = mysql_fetch_array($result2)) {
+										extract ($row2);
+										$tcp=$row2[1]; 
+										$tnu=$row2[2]; 
+									}
+								}
+								if($tcp==null) $tcp=0;
+								if($tnu==null) $tnu=0;
+								if((($theCurGPs[0]+$thePreGPs[0]+$tcp)==0) || 
+									(($theCurGPs[1]+$thePreGPs[1]+$tnu)==0)){
+									$cgpa = 0;
+								}else{
+									$cgpa = (doubleval($theCurGPs[0])+doubleval($thePreGPs[0])+doubleval($tcp))/ (doubleval($theCurGPs[1])+doubleval($thePreGPs[1])+doubleval($tnu));
+								}
+
+								if(str_in_str($remarkprob,"TW")){
+									$remarkprob="DLT";
+									$dltstudents .= $regNumber."][";
+								}else if(intval(number_format($cgpa,2))<2 && $remarkprob=="") {
+									$remarkprob="P1";
+									if(str_in_str($remarkdnr,"DNR")) $remarkprob="";
+								}else if(intval(number_format($cgpa,2))<2 && $remarkprob=="P1") {
+									$remarkprob="P2";
+									if(str_in_str($remarkdnr,"DNR")) $remarkprob="P1";
+								}else if(intval(number_format($cgpa,2))<1 && $remarkprob=="P1") {
+									$remarkprob="P2TW";
+									if(str_in_str($remarkdnr,"DNR")) $remarkprob="P1";
+								}else if(intval(number_format($cgpa,2))<1 && $remarkprob=="P2") {
+									$remarkprob="P3TW";
+									if(str_in_str($remarkdnr,"DNR")) $remarkprob="P2";
+								}else if(intval(number_format($cgpa,2))<2 && $remarkprob=="P2") {
+									$remarkprob="P3TW";
+									if(str_in_str($remarkdnr,"DNR")) $remarkprob="P2";
+								}else{
+									$remarkprob="";
+								}
+							}
+							$queryRemark = "update remarkstable set remarkprob='{$remarkprob}', remarkdnr='{$remarkdnr}' where matricno='{$regNumber}' and facultycode='{$facultycodes}' and departmentcode='{$departmentcodes}' and programmecode='{$programmecodes}' and studentlevel='{$studentlevels}' and sessions='{$sessionss}' and semester='{$semesters}' ";
+							mysql_query($queryRemark, $connection);
+//if($regNumber>='126251002' && $regNumber<='126251002') echo $queryRemark."  4   queryRemark<br>";
+						}
+					}*/
+/* ----   A    ------*/
+
+
+
+/* ----   B    ------*/
+					/*$queryD = "SELECT min(sessions) as firstsession FROM registration where regNumber='{$regNumber}'  ";
+					$resultD = mysql_query($queryD, $connection);
+					extract (mysql_fetch_array($resultD));
+
+					$PrevSession=$GLOBALS['PrevSession'];
+					$PrevSemester=$GLOBALS['PrevSemester'];
+					$queryPrevRemark = "SELECT serialno from remarkstable where matricno='{$matno}' and facultycode='{$facultycodes}' and departmentcode='{$departmentcodes}' and programmecode='{$programmecodes}' and studentlevel='{$studentlevels}' and sessions='{$PrevSession}' and semester='{$PrevSemester}' ";
+					$resultPrevRemark = mysql_query($queryPrevRemark, $connection);
+					if($PrevSession==null || $PrevSession==""){
+						$GLOBALS['PrevRemarkSNo']=0;
+					}else{
+						if(mysql_num_rows($resultPrevRemark) > 0){
+							extract (mysql_fetch_array($resultPrevRemark));
+							$GLOBALS['PrevRemarkSNo']=$serialno;
+						}
+					}
+					if($GLOBALS['PrevRemarkSNo']!=null && $GLOBALS['PrevRemarkSNo']!="" && $GLOBALS['PrevRemarkSNo']>0){
+						$PrevRemarkSNo = $GLOBALS['PrevRemarkSNo'];
+						$queryPrevRemark = "SELECT * from remarkstable where serialno='{$PrevRemarkSNo}' ";
+						$resultPrevRemark = mysql_query($queryPrevRemark, $connection);
+						if(mysql_num_rows($resultPrevRemark) > 0){
+							extract (mysql_fetch_array($resultPrevRemark));
+						}
+
+						$query4 = "SELECT count(*) as totalDNRcourses FROM finalresultstable where sessiondescription='{$sessionss}' and semester='{$semesters}' and registrationnumber='{$regNumber}' and gradecode='DNR' ";
+						$result4 = mysql_query($query4, $connection);
+						extract (mysql_fetch_array($result4));
+
+						if($totalDNRcourses==$GLOBALS['noofcourses']){
+							if($remarkdnr==""){
+								$remarkdnr="DNR1";
+							}else if($remarkdnr=="DNR1"){
+								$remarkdnr="DNR2";
+							}else if($remarkdnr=="DNR2"){
+								$remarkdnr="DNR3VW";
+							}else if(str_in_str($remarkdnr,"VW")){
+								$remarkdnr="DLT";
+								//$dltstudents .= $regNumber."][";
+							}
+						}else{
+							$remarkdnr="";
+						}
+						if($sesionsreabsurption==$sessionss) $remarkdnr="";
+
+						$curGP =  getCurrentGPA($facultycodes, $departmentcodes, $programmecodes, $studentlevel, $sessions, $semester, $regNumber);
+						$theCurGPs = explode("][", $curGP);
+						$preGP = getPreviousGPA($facultycodes, $departmentcodes, $programmecodes, $studentlevel, $sessions, $semester, $regNumber);
+						$thePreGPs = explode("][", $preGP);
+						$tcp=0.0; $cgpa=0;
+						$query2 = "SELECT regNumber, tcp, tnu, gpa, tnup FROM regularstudents where regNumber='{$regNumber}' and facultycode='{$facultycodes}' and departmentcode='{$departmentcodes}' and programmecode='{$programmecodes}' ";
+						$result2 = mysql_query($query2, $connection);
+						if(mysql_num_rows($result2) > 0){
+							while ($row2 = mysql_fetch_array($result2)) {
+								extract ($row2);
+								$tcp=$row2[1]; 
+								$tnu=$row2[2]; 
+							}
+						}
+						if($tcp==null) $tcp=0;
+						if($tnu==null) $tnu=0;
+						if((($theCurGPs[0]+$thePreGPs[0]+$tcp)==0) || 
+							(($theCurGPs[1]+$thePreGPs[1]+$tnu)==0)){
+							$cgpa = 0;
+						}else{
+							$cgpa = (doubleval($theCurGPs[0])+doubleval($thePreGPs[0])+doubleval($tcp))/ (doubleval($theCurGPs[1])+doubleval($thePreGPs[1])+doubleval($tnu));
+						}
+
+						if(str_in_str($remarkprob,"TW")){
+							$remarkprob="DLT";
+							$dltstudents .= $regNumber."][";
+						}else if(intval(number_format($cgpa,2))<2 && $remarkprob=="") {
+							$remarkprob="P1";
+							if(str_in_str($remarkdnr,"DNR")) $remarkprob="";
+						}else if(intval(number_format($cgpa,2))<2 && $remarkprob=="P1") {
+							$remarkprob="P2";
+							if(str_in_str($remarkdnr,"DNR")) $remarkprob="P1";
+						}else if(intval(number_format($cgpa,2))<1 && $remarkprob=="P1") {
+							$remarkprob="P2TW";
+							if(str_in_str($remarkdnr,"DNR")) $remarkprob="P1";
+						}else if(intval(number_format($cgpa,2))<1 && $remarkprob=="P2") {
+							$remarkprob="P3TW";
+							if(str_in_str($remarkdnr,"DNR")) $remarkprob="P2";
+						}else if(intval(number_format($cgpa,2))<2 && $remarkprob=="P2") {
+							$remarkprob="P3TW";
+							if(str_in_str($remarkdnr,"DNR")) $remarkprob="P2";
+						}else{
+							$remarkprob="";
+						}
+
+						$queryRemark = "update remarkstable set remarkprob='{$remarkprob}', remarkdnr='{$remarkdnr}' where matricno='{$regNumber}' and facultycode='{$facultycodes}' and departmentcode='{$departmentcodes}' and programmecode='{$programmecodes}' and studentlevel='{$studentlevels}' and sessions='{$sessionss}' and semester='{$semesters}' ";
+						mysql_query($queryRemark, $connection);
+
+//if($regNumber>='126251002' && $regNumber<='126251002') echo $queryRemark."  5   queryRemark<br>";
+					}else{
+						$queryD = "SELECT b.* FROM regularstudents a, registration b where a.regNumber=b.regNumber and a.regNumber='{$regNumber}' and ((b.sessions='{$sessionss}' and b.semester='{$semesters}') or (b.sessions='{$sessionss}' and b.semester<'{$semesters}') or (b.sessions<'{$sessionss}')) and b.sessions>='{$firstsession}' and a.facultycode='{$facultycodes}' and a.departmentcode='{$departmentcodes}' and a.programmecode='{$programmecodes}' order by b.sessions, b.semester";
+	//echo $queryD."<br><br><br>";
+						$resultD = mysql_query($queryD, $connection);
+						$thecounter=0;
+						$remarkprob="";
+						$remarkdnr="";
+						if(mysql_num_rows($resultD) > 0){
+	//echo "----------------------- <br>";
+							while ($rowD = mysql_fetch_array($resultD)) {
+								extract ($rowD);
+								$thecounter++;
+
+								$query4 = "SELECT count(*) as totalDNRcourses FROM finalresultstable where sessiondescription='{$sessions}' and semester='{$semester}' and registrationnumber='{$regNumber}' and gradecode='DNR' ";
+								$result4 = mysql_query($query4, $connection);
+								extract (mysql_fetch_array($result4));
+								//if($registered!="Yes" && $thecounter>=2){
+								if($totalDNRcourses==$GLOBALS['noofcourses'] && $thecounter>=2){
+									if($remarkdnr==""){
+										$remarkdnr="DNR1";
+									}else if($remarkdnr=="DNR1"){
+										$remarkdnr="DNR2";
+									}else if($remarkdnr=="DNR2"){
+										$remarkdnr="DNR3VW";
+									}else if(str_in_str($remarkdnr,"VW")){
+										$remarkdnr="DLT";
+										//$dltstudents .= $regNumber."][";
+									}
+								}else{
+									$remarkdnr="";
+								}
+
+								if($sesionsreabsurption==$sessionss) $remarkdnr="";
+								$curGP =  getCurrentGPA($facultycode, $departmentcode, $programmecode, $studentlevel, $sessions, $semester, $regNumber);
+								$theCurGPs = explode("][", $curGP);
+								$preGP = getPreviousGPA($facultycode, $departmentcodes, $programmecode, $studentlevel, $sessions, $semester, $regNumber);
+								$thePreGPs = explode("][", $preGP);
+								$tcp=0.0; $cgpa=0;
+								$query2 = "SELECT regNumber, tcp, tnu, gpa, tnup FROM regularstudents where regNumber='{$regNumber}' and facultycode='{$facultycodes}' and departmentcode='{$departmentcodes}' and programmecode='{$programmecodes}' ";
+								$result2 = mysql_query($query2, $connection);
+								if(mysql_num_rows($result2) > 0){
+									while ($row2 = mysql_fetch_array($result2)) {
+										extract ($row2);
+										$tcp=$row2[1]; 
+										$tnu=$row2[2]; 
+									}
+								}
+								if($tcp==null) $tcp=0;
+								if($tnu==null) $tnu=0;
+								if((($theCurGPs[0]+$thePreGPs[0]+$tcp)==0) || 
+									(($theCurGPs[1]+$thePreGPs[1]+$tnu)==0)){
+									$cgpa = 0;
+								}else{
+									$cgpa = (doubleval($theCurGPs[0])+doubleval($thePreGPs[0])+doubleval($tcp))/ (doubleval($theCurGPs[1])+doubleval($thePreGPs[1])+doubleval($tnu));
+								}
+
+								if(str_in_str($remarkprob,"TW")){
+									$remarkprob="DLT";
+									$dltstudents .= $regNumber."][";
+								}else if(intval(number_format($cgpa,2))<2 && $remarkprob=="") {
+									$remarkprob="P1";
+									if(str_in_str($remarkdnr,"DNR")) $remarkprob="";
+								}else if(intval(number_format($cgpa,2))<2 && $remarkprob=="P1") {
+									$remarkprob="P2";
+									if(str_in_str($remarkdnr,"DNR")) $remarkprob="P1";
+								}else if(intval(number_format($cgpa,2))<1 && $remarkprob=="P1") {
+									$remarkprob="P2TW";
+									if(str_in_str($remarkdnr,"DNR")) $remarkprob="P1";
+								}else if(intval(number_format($cgpa,2))<1 && $remarkprob=="P2") {
+									$remarkprob="P3TW";
+									if(str_in_str($remarkdnr,"DNR")) $remarkprob="P2";
+								}else if(intval(number_format($cgpa,2))<2 && $remarkprob=="P2") {
+									$remarkprob="P3TW";
+									if(str_in_str($remarkdnr,"DNR")) $remarkprob="P2";
+								}else{
+									$remarkprob="";
+								}
+							}
+							$queryRemark = "update remarkstable set remarkprob='{$remarkprob}', remarkdnr='{$remarkdnr}' where matricno='{$regNumber}' and facultycode='{$facultycodes}' and departmentcode='{$departmentcodes}' and programmecode='{$programmecodes}' and studentlevel='{$studentlevels}' and sessions='{$sessionss}' and semester='{$semesters}' ";
+							mysql_query($queryRemark, $connection);
+
+//if($regNumber>='126251002' && $regNumber<='126251002') echo $queryRemark."  6   queryRemark<br>";
+						}
+					}*/
+/* ----   B    ------*/
